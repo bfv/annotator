@@ -1,0 +1,7 @@
+# Binaries
+build/
+
+# Output files
+annotations.json
+annotations.log
+
