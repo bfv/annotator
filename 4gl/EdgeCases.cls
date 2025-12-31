@@ -27,4 +27,17 @@ class EdgeCases:
   method public void AlsoIgnored():
   end.
 
+  method public void NoAnnotation():
+    
+    var int i, j.
+    
+    // The following line has an invalid annotation inside a comment
+    assign /* blabla
+              @RETURN is not a valid identifier */
+      i = 1
+      j = 2
+      .
+
+  end.
+
 end class.

@@ -188,7 +188,7 @@ func classifyLines(lines []string) []string {
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
 
-		// Handle block comments
+		// Handle block comments - check entire line, not just prefix
 		if inBlockComment {
 			types[i] = "comment"
 			if strings.Contains(line, "*/") {
@@ -197,9 +197,14 @@ func classifyLines(lines []string) []string {
 			continue
 		}
 
-		if strings.HasPrefix(trimmed, "/*") {
+		// Check if block comment starts anywhere in the line
+		if strings.Contains(line, "/*") {
 			types[i] = "comment"
-			if !strings.Contains(trimmed, "*/") {
+			// Check if it also closes on the same line
+			commentStart := strings.Index(line, "/*")
+			commentEnd := strings.Index(line[commentStart:], "*/")
+			if commentEnd == -1 {
+				// Comment doesn't close on this line
 				inBlockComment = true
 			}
 			continue
@@ -211,7 +216,7 @@ func classifyLines(lines []string) []string {
 			continue
 		}
 
-		// Handle annotations
+		// Handle annotations (only if not in a comment)
 		if strings.HasPrefix(trimmed, "@") {
 			types[i] = "annotation"
 			if !strings.Contains(trimmed, ".") {
