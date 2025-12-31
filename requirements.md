@@ -93,3 +93,5 @@ Standard: 0 = success, 1 = general error, 2 = invalid usage
 - windows: `annotator.exe` 
 - linux: `annotator`
 
+## terminal
+Development primarily takes place on Windows. We use cmd.exe for issuing commands. No powershell. 
