@@ -35,11 +35,17 @@ jobs:
         run: |
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags "-X main.version=${{ github.ref_name }} -w -s" -o build/${{ matrix.binary }} ./cmd/annotator
 
-      - name: Create GitHub Release
+      - name: Upload binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/${{ matrix.binary }}
+          generate_release_notes: true
+          
+      - name: Upload documentation
+        if: matrix.os == 'linux'
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            build/${{ matrix.binary }}
             README.md
             LICENSE
           generate_release_notes: true
