@@ -8,10 +8,8 @@ on:
 run-name: Release ${{ github.ref_name }}
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     strategy:
       matrix:
         include:
@@ -24,7 +22,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
 
       - name: Set up Go
         uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
@@ -34,18 +32,41 @@ jobs:
       - name: Build for ${{ matrix.os }}
         run: |
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags "-X main.version=${{ github.ref_name }} -w -s" -o build/${{ matrix.binary }} ./cmd/annotator
-
-      - name: Upload binary
-        uses: softprops/action-gh-release@v2
-        with:
-          files: build/${{ matrix.binary }}
-          generate_release_notes: true
           
-      - name: Upload documentation
-        if: matrix.os == 'linux'
-        uses: softprops/action-gh-release@v2
+      - name: Create archive
+        run: |
+          mkdir -p dist
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            zip dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip -j build/${{ matrix.binary }} README.md LICENSE
+          else
+            tar -czf dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz -C build ${{ matrix.binary }} -C .. README.md LICENSE
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        with:
+          name: ${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131  # v7.0.0
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b  # v2.5.0
         with:
           files: |
-            README.md
-            LICENSE
-          generate_release_notes: true
+            artifacts/**/*
+          prerelease: ${{ contains(github.ref_name, '-rc') }}
+          generate_release_notes: ${{ !contains(github.ref_name, '-rc') }}
