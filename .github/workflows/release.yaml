@@ -48,11 +48,12 @@ jobs:
           name: ${{ matrix.os }}-${{ matrix.arch }}
           path: dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.*
 
-      - name: upload docker artifact
+      - name: upload docker artifacts
         if: matrix.os == 'linux' && matrix.arch == 'amd64'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
         with:
           name: docker-executable
+
           path: |
             build/annotator
             Dockerfile
@@ -88,6 +89,10 @@ jobs:
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131  # v7.0.0
         with:
           name: docker-executable
+
+      - name: Prepare docker build context
+        run: |
+          mv build/annotator ./
 
       - name: Get version without v
         id: version
