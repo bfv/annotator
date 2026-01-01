@@ -35,18 +35,24 @@ jobs:
           
       - name: Create archive
         run: |
-          cd build
+          mkdir -p dist
           if [ "${{ matrix.os }}" = "windows" ]; then
-            zip -r annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip ${{ matrix.binary }} ../README.md ../LICENSE
+            cd build
+            zip ../dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip ${{ matrix.binary }}
+            cd ..
+            zip -j dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip README.md LICENSE
           else
-            tar -czf annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz ${{ matrix.binary }} -C .. README.md LICENSE
+            cd build
+            tar -czf ../dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz ${{ matrix.binary }}
+            cd ..
+            tar -rzf dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz README.md LICENSE
           fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}
-          path: build/annotator-${{ matrix.os }}-${{ matrix.arch }}.*
+          path: dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.*
 
   release:
     needs: build
