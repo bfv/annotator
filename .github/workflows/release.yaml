@@ -83,6 +83,9 @@ jobs:
   dockerize:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     #if: needs.build.outputs.docker-image != ''
     steps:
       - name: Download docker artifact
