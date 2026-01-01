@@ -31,7 +31,7 @@ jobs:
 
       - name: Build for ${{ matrix.os }}
         run: |
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags "-X main.version=${{ github.ref_name }} -w -s" -o build/${{ matrix.binary }} ./cmd/annotator
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} CGO_ENABLED=0 go build -ldflags "-X main.version=${{ github.ref_name }} -w -s" -o build/${{ matrix.binary }} ./cmd/annotator
           
       - name: Create archive
         run: |
