@@ -37,15 +37,9 @@ jobs:
         run: |
           mkdir -p dist
           if [ "${{ matrix.os }}" = "windows" ]; then
-            cd build
-            zip ../dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip ${{ matrix.binary }}
-            cd ..
-            zip -j dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip README.md LICENSE
+            zip dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip -j build/${{ matrix.binary }} README.md LICENSE
           else
-            cd build
-            tar -czf ../dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz ${{ matrix.binary }}
-            cd ..
-            tar -rzf dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz README.md LICENSE
+            tar -czf dist/annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz -C build ${{ matrix.binary }} -C .. README.md LICENSE
           fi
 
       - name: Upload artifact
