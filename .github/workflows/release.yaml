@@ -32,21 +32,21 @@ jobs:
       - name: Build for ${{ matrix.os }}
         run: |
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags "-X main.version=${{ github.ref_name }} -w -s" -o build/${{ matrix.binary }} ./cmd/annotator
+          
+      - name: Create archive
+        run: |
+          cd build
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            zip -r annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.zip ${{ matrix.binary }} ../README.md ../LICENSE
+          else
+            tar -czf annotator-${{ matrix.os }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz ${{ matrix.binary }} -C .. README.md LICENSE
+          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}
-          path: build/${{ matrix.binary }}
-
-      - name: Upload docs
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
-        if: matrix.os == 'linux'
-        with:
-          name: documentation
-          path: |
-            README.md
-            LICENSE
+          path: build/annotator-${{ matrix.os }}-${{ matrix.arch }}.*
 
   release:
     needs: build
@@ -69,4 +69,4 @@ jobs:
           files: |
             artifacts/**/*
           prerelease: ${{ contains(github.ref_name, '-rc') }}
-          generate_release_notes: true
+          generate_release_notes: ${{ !contains(github.ref_name, '-rc') }}
