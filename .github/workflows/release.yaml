@@ -101,6 +101,12 @@ jobs:
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} # Gebruik hier je PAT, niet je wachtwoord
+
       - name: Build and push Docker image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83  # v6.18.0
         with:
@@ -109,6 +115,3 @@ jobs:
           platforms: linux/amd64
           tags: devbfvio/openedge-annotator:${{ steps.version.outputs.version }}
           push: true
-        env:
-          DOCKER_HUB_USERNAME: ${{ vars.DOCKER_HUB_USERNAME }}
-          DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
