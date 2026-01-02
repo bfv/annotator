@@ -20,7 +20,7 @@ build-windows:
 	set GOOS=windows&& set GOARCH=amd64&& go build -o $(BUILDDIR)/$(BINARY_WINDOWS) -ldflags "-X main.version=$(VERSION) -w -s" ./cmd/annotator
 
 build-linux:
-	set GOOS=linux&& set GOARCH=amd64&& go build -o $(BUILDDIR)/$(BINARY_LINUX) -ldflags "-X main.version=$(VERSION) -w -s" ./cmd/annotator
+	set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=amd64&& go build -o $(BUILDDIR)/$(BINARY_LINUX) -ldflags "-X main.version=$(VERSION) -w -s" ./cmd/annotator
 
 clean:
 	if exist annotator.exe del annotator.exe

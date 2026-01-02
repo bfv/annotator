@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -37,6 +38,7 @@ func init() {
 
 func runParse(cmd *cobra.Command, args []string) {
 	directory := args[0]
+	startTime := time.Now()
 
 	// Initialize logger
 	logFile := "annotations.log"
@@ -96,7 +98,15 @@ func runParse(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	logger.Info().Msg("Done")
+	// Calculate and log elapsed time
+	elapsed := time.Since(startTime)
+	var elapsedStr string
+	if elapsed.Seconds() < 5 {
+		elapsedStr = fmt.Sprintf("%dms", elapsed.Milliseconds())
+	} else {
+		elapsedStr = fmt.Sprintf("%.1fs", elapsed.Seconds())
+	}
+	logger.Info().Str("elapsed", elapsedStr).Msg("Done")
 }
 
 func findClsFiles(root string) ([]string, error) {
