@@ -29,10 +29,19 @@ jobs:
         with:
           go-version: '1.25'
 
+      - name: Install syft
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
       - name: Build for ${{ matrix.os }}
         run: |
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} CGO_ENABLED=0 go build -ldflags "-X main.version=${{ github.ref_name }} -w -s" -o build/${{ matrix.binary }} ./cmd/annotator
           
+      - name: Generate SBOM
+        run: |
+          syft packages dir:. -o spdx-json > sbom-spdx-${{ matrix.os }}-${{ matrix.arch }}.json
+          syft packages dir:. -o cyclonedx-json > sbom-cyclonedx-${{ matrix.os }}-${{ matrix.arch }}.json
+
       - name: Create archive
         run: |
           mkdir -p dist
@@ -41,6 +50,13 @@ jobs:
           else
             tar -czf dist/annotator-${{ matrix.os }}-${{ matrix.arch }}.tar.gz -C build ${{ matrix.binary }} -C .. README.md LICENSE
           fi
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: sbom-files
+          path: |
+            sbom-*.json
 
       - name: Upload release artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
@@ -76,6 +92,7 @@ jobs:
         with:
           files: |
             artifacts/**/*
+            sbom-*.json
           prerelease: ${{ contains(github.ref_name, '-rc') }}
           generate_release_notes: ${{ !contains(github.ref_name, '-rc') }}
 
