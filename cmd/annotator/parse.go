@@ -261,6 +261,12 @@ func classifyLines(lines []string) []string {
 			continue
 		}
 
+		// Handle DEFINE PROPERTY statement
+		if regexp.MustCompile(`(?i)\bDEFINE\s+.*?\bPROPERTY\s+`).MatchString(trimmed) {
+			types[i] = "property"
+			continue
+		}
+
 		// Default
 		types[i] = "code"
 	}
@@ -309,6 +315,13 @@ func parseAnnotation(lines []string, startLine int, filePath, className string, 
 		if lt == "method" {
 			constructType = "method"
 			constructName = extractMethodName(lines[i])
+			constructLine = i + 1 // 1-based line number
+			break
+		}
+
+		if lt == "property" {
+			constructType = "property"
+			constructName = extractPropertyName(lines[i])
 			constructLine = i + 1 // 1-based line number
 			break
 		}
@@ -421,6 +434,17 @@ func extractMethodName(line string) string {
 	// Look for method name after VOID or return type
 	// Pattern: METHOD [modifiers] {VOID|return-type} method-name (
 	re := regexp.MustCompile(`(?i)\bMETHOD\b.*?\b(?:VOID|[\w.]+)\s+([\w]+)\s*\(`)
+	matches := re.FindStringSubmatch(line)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+	return ""
+}
+
+func extractPropertyName(line string) string {
+	// Look for property name after PROPERTY keyword
+	// Pattern: DEFINE [modifiers] PROPERTY property-name
+	re := regexp.MustCompile(`(?i)\bDEFINE\b.*?\bPROPERTY\s+([\w]+)`)
 	matches := re.FindStringSubmatch(line)
 	if len(matches) > 1 {
 		return matches[1]
