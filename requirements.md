@@ -24,35 +24,38 @@ The goal of the annotator project is to scan OpenEdge 4GL class file (file with 
 - each .cls file is parsed for:
   - the class name, fully qualified 
   - annotations
-- there are 3 types of annotations:
+- there are 4 types of annotations:
   - class
   - method
+  - property
   - free
-- a annotation is tied to a method or a class, if there is between the annotation and the class or method there is:
+- a annotation is tied to a method, property or a class, if there is between the annotation and the class or method there is:
   - zero lines
   - blank lines
   - comments
   - other annotations
-- if not tied to a class or method, the type is free
+- if not tied to a class, property or method, the type is free
 - multiple annotations per construct can occur
 - for every annotation the following is recorded:
-  - the annotation name
+  - the annotation name (case of the first found occurence)
   - an array of attribute/value pairs
   - the relative directory name of the containing .cls file
   - the fully qualified class name
   - the type
-  - if applicable the method name, in `constructName`
+  - if applicable, the method or property name, in `constructName`
   - the line number of the start of the annotation 
   - the line number of the class or method the annotation belongs to
+- for properties:
+  - only the property name needs to be recorded, the rest can be discarded
 - if an annotation spans multiple lines, the starting line is registered
 - annotations in comments are not to be parsed
-- there are nog particulair naming conventiions for attributes.
+- there are no particular naming conventiions for attributes.
 - if an annotation is not complete, the source will not compile. Since this tools is ran *after* compilation, correct annotations can be expected.
 - escape character are the to be interpreted. Just register as-is.
 - symlinks should be followed.
   
 ## output
-The output should be an array of annotation name, which in turn has an array of all occurrences of that annotation.
+The output should be an annotation name properties of the annotation property, which in turn has an array of all occurrences of that annotation.
 The output should go to `annotations.json`, unless the `-o` parameter (with filename is specified). If is `--stdout` is specified, you know to do. `-o` takes preference over `--stdout`
 The output should be pretty printed, unless the `--compact` is specified
 The minimum output is in case of no annotations found is:

@@ -28,6 +28,27 @@ METHOD [ PRIVATE | PACKAGE-PRIVATE | PROTECTED | PACKAGE-PROTECTED | PUBLIC ]
 
 methods are ended with either `end.` or `end method.`
 
+## define property statement
+Properties in classes are expressed like:
+```
+DEFINE [ PRIVATE | PROTECTED | PUBLIC ][ STATIC | ABSTRACT ]
+       [ OVERRIDE ][ SERIALIZABLE | NON-SERIALIZABLE ] 
+  PROPERTY property-name 
+  {{ 
+        AS primitive-type-name|
+        AS [ CLASS ]object-type-name 
+     } [ EXTENT [constant  ] ]}
+  [ INITIAL { constant  | {[constant[ , constant]...]}}]
+  [ SERIALIZE-NAME serialize-name ][ NO-UNDO ]
+  { 
+        [accessor-access-mode] GET [implementation] . 
+        SET [implementation] .
+     | 
+        GET [implementation] .
+        [accessor-access-mode] SET [implementation] .
+  }
+```
+
 ## annotations
 ```
 @annotation[(attribute = "value"[,attribute = "value"]...)].
@@ -113,3 +134,4 @@ or
   "constructLine": 5
 }
 ``` 
+

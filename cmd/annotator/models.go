@@ -12,7 +12,7 @@ type Annotation struct {
 	Attributes     []Attribute `json:"attributes"`
 	File           string      `json:"file"`
 	ClassName      string      `json:"classname"`
-	Type           string      `json:"type"` // "class", "method", or "free"
+	Type           string      `json:"type"` // "class", "method", "property", or "free"
 	ConstructName  string      `json:"constructName,omitempty"`
 	AnnotationLine int         `json:"annotationLine"`
 	ConstructLine  int         `json:"constructLine,omitempty"`
