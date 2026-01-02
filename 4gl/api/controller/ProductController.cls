@@ -2,6 +2,13 @@
 @cors(enabled="true").
 class api.controller.ProductController:
 
+  @id(type="guid").
+  define property Id as char no-undo get. set.
+  
+  @name.
+  define property Name as character no-undo get. set.
+
+
   @get(path="/{id}").
   @response(code="200", type="Product").
   @response(code="404", type="Error").
