@@ -42,7 +42,6 @@ jobs:
         run: |
           syft packages dir:. -o spdx-json > sbom-spdx-${{ matrix.os }}-${{ matrix.arch }}.json
           syft packages dir:. -o cyclonedx-json > sbom-cyclonedx-${{ matrix.os }}-${{ matrix.arch }}.json
-          ls -l 
 
       - name: Scan SBOM for vulnerabilities
         run: |
