@@ -29,9 +29,10 @@ jobs:
         with:
           go-version: '1.25'
 
-      - name: Install syft
+      - name: Install syft and grype
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Build for ${{ matrix.os }}
         run: |
@@ -42,6 +43,10 @@ jobs:
           syft packages dir:. -o spdx-json > sbom-spdx-${{ matrix.os }}-${{ matrix.arch }}.json
           syft packages dir:. -o cyclonedx-json > sbom-cyclonedx-${{ matrix.os }}-${{ matrix.arch }}.json
           ls -l 
+
+      - name: Scan SBOM for vulnerabilities
+        run: |
+          grype sbom:sbom-cyclonedx-${{ matrix.os }}-${{ matrix.arch }}.json --fail-on critical
 
       - name: Create archive
         run: |
