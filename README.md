@@ -100,3 +100,8 @@ The following is a fragment of `annotation.json` of a parse of the examples clas
   }
 }
 ```
+| property | description |
+|--|--|
+| `constructName` | holds the method/property name |
+| `annotationLine` | the line number at which the annotation started |
+| `constructLine` | the line where the method or property statement starts |
