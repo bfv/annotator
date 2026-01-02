@@ -48,6 +48,9 @@ Notes:
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 1.0.0   | 2026-01-02 | First full release |
+|         |            | SBOM files in release artifacts |
+|         |            | SBOM checked for critical vulnerabilities |
 | 0.10.0  | 2026-01-02 | added property annotations |
 |         |            | added labels to container image |
 |         |            | added documentation to README.md |
