@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+      - develop
+      - release/*
 
 jobs:
   validate-source:
@@ -12,17 +14,31 @@ jobs:
       - name: Check source branch name
         run: |
           SOURCE_BRANCH=${{ github.head_ref }}
-          echo "Analyzing source branch: $SOURCE_BRANCH"
+          TARGET_BRANCH=${{ github.base_ref }}
+          echo "Analyzing PR: $SOURCE_BRANCH -> $TARGET_BRANCH"
           
-          # Allow 'develop' or any branch starting with 'release/'
-          if [[ "$SOURCE_BRANCH" == "develop" ]] || [[ "$SOURCE_BRANCH" =~ ^release/.* ]]; then
-            echo "✅ Success: Pull Request source branch is valid."
-            exit 0
-          else
-            echo "----------------------------------------------------------------"
-            echo "❌ ERROR: Invalid source branch for Pull Request to 'main'."
-            echo "Direct merges from '$SOURCE_BRANCH' are not allowed."
-            echo "Only 'develop' or 'release/*' branches can be merged into 'main'."
-            echo "----------------------------------------------------------------"
-            exit 1
+          # Rules for merging to 'main'
+          if [[ "$TARGET_BRANCH" == "main" ]]; then
+            if [[ "$SOURCE_BRANCH" == "develop" ]] || [[ "$SOURCE_BRANCH" =~ ^release/.* ]]; then
+              echo "✅ Success: Pull Request to 'main' from '$SOURCE_BRANCH' is valid."
+              exit 0
+            else
+              echo "----------------------------------------------------------------"
+              echo "❌ ERROR: Invalid source branch for Pull Request to 'main'."
+              echo "Direct merges from '$SOURCE_BRANCH' are not allowed."
+              echo "Only 'develop' or 'release/*' branches can be merged into 'main'."
+              echo "----------------------------------------------------------------"
+              exit 1
+            fi
           fi
+          
+          # Rules for merging to 'develop' or 'release/*'
+          if [[ "$TARGET_BRANCH" == "develop" ]] || [[ "$TARGET_BRANCH" =~ ^release/.* ]]; then
+            echo "✅ Success: Pull Request to '$TARGET_BRANCH' from '$SOURCE_BRANCH' is valid."
+            echo "Feature branches are allowed to merge into develop and release branches."
+            exit 0
+          fi
+          
+          # If we get here, something unexpected happened
+          echo "⚠️  Warning: Unexpected target branch '$TARGET_BRANCH'. Allowing PR to proceed."
+          exit 0
