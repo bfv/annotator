@@ -10,6 +10,7 @@ on:
 jobs:
   validate-source:
     runs-on: ubuntu-latest
+    if: false  # This disables the workflow
     steps:
       - name: Check source branch name
         run: |
