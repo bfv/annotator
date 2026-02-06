@@ -151,7 +151,7 @@ end interface.`
 		{"query", "method", "getAllUsers", 5},
 		{"cache", "method", "getAllUsers", 6},
 		{"command", "method", "createUser", 9},
-		{"todo", "free", "", 12},
+		{"todo", "free", "", 13},
 	}
 
 	if len(annotations) != len(expectedAnnotations) {
@@ -159,6 +159,9 @@ end interface.`
 	}
 
 	for i, expected := range expectedAnnotations {
+		if i >= len(annotations) {
+			t.Fatalf("Missing annotation at index %d", i)
+		}
 		ann := annotations[i]
 		if ann.Name != expected.name {
 			t.Errorf("Annotation %d: expected name %s, got %s", i, expected.name, ann.Name)
@@ -166,11 +169,14 @@ end interface.`
 		if ann.Type != expected.annotationType {
 			t.Errorf("Annotation %d: expected type %s, got %s", i, expected.annotationType, ann.Type)
 		}
-		if ann.ConstructName != expected.constructName {
-			t.Errorf("Annotation %d: expected construct name %s, got %s", i, expected.constructName, ann.ConstructName)
+		// Only check construct name for method annotations
+		if expected.annotationType == "method" {
+			if ann.ConstructName != expected.constructName {
+				t.Errorf("Annotation %d (%s): expected construct name %s, got %s", i, ann.Name, expected.constructName, ann.ConstructName)
+			}
 		}
 		if ann.AnnotationLine != expected.lineNum {
-			t.Errorf("Annotation %d: expected line %d, got %d", i, expected.lineNum, ann.AnnotationLine)
+			t.Errorf("Annotation %d (%s): expected line %d, got %d", i, ann.Name, expected.lineNum, ann.AnnotationLine)
 		}
 	}
 

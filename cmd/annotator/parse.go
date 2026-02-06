@@ -150,18 +150,30 @@ func extractClassName(content, filePath string) string {
 	// Remove comments first
 	content = removeComments(content)
 
-	// Look for CLASS statement
-	re := regexp.MustCompile(`(?i)\bCLASS\s+([\w.]+)`)
-	matches := re.FindStringSubmatch(content)
-	if len(matches) > 1 {
-		return matches[1]
+	// Find the first occurrence of either CLASS or INTERFACE
+	classRe := regexp.MustCompile(`(?i)\bCLASS\s+([\w.]+)`)
+	interfaceRe := regexp.MustCompile(`(?i)\bINTERFACE\s+([\w.]+)`)
+	
+	classMatches := classRe.FindStringSubmatch(content)
+	interfaceMatches := interfaceRe.FindStringSubmatch(content)
+	
+	// Find positions of matches
+	classPos := -1
+	interfacePos := -1
+	
+	if len(classMatches) > 1 {
+		classPos = classRe.FindStringIndex(content)[0]
 	}
-
-	// Look for INTERFACE statement
-	re = regexp.MustCompile(`(?i)\bINTERFACE\s+([\w.]+)`)
-	matches = re.FindStringSubmatch(content)
-	if len(matches) > 1 {
-		return matches[1]
+	if len(interfaceMatches) > 1 {
+		interfacePos = interfaceRe.FindStringIndex(content)[0]
+	}
+	
+	// Return whichever comes first
+	if classPos >= 0 && (interfacePos < 0 || classPos < interfacePos) {
+		return classMatches[1]
+	}
+	if interfacePos >= 0 {
+		return interfaceMatches[1]
 	}
 
 	// Fallback: derive from file path
@@ -450,13 +462,28 @@ func smartSplit(text string, sep rune) []string {
 }
 
 func extractMethodName(line string) string {
-	// Look for method name after VOID or return type
-	// Pattern: METHOD [modifiers] {VOID|return-type} method-name (
-	re := regexp.MustCompile(`(?i)\bMETHOD\b.*?\b(?:VOID|[\w.]+)\s+([\w]+)\s*\(`)
+	// Simpler approach: find the word immediately before ( or .
+	// after ensuring it's a METHOD line
+	if !regexp.MustCompile(`(?i)\bMETHOD\b`).MatchString(line) {
+		return ""
+	}
+	
+	// Find the method name - it's the word immediately before ( or .
+	re := regexp.MustCompile(`([\w]+)\s*[\(\.]`)
 	matches := re.FindStringSubmatch(line)
 	if len(matches) > 1 {
-		return matches[1]
+		methodName := matches[1]
+		// Make sure it's not a modifier or keyword
+		modifiers := []string{"PUBLIC", "PRIVATE", "PROTECTED", "PACKAGE-PRIVATE", "PACKAGE-PROTECTED", 
+			"STATIC", "ABSTRACT", "OVERRIDE", "FINAL", "VOID", "METHOD", "INPUT", "OUTPUT", "AS"}
+		for _, mod := range modifiers {
+			if strings.EqualFold(methodName, mod) {
+				return "" // This is a modifier, not a method name
+			}
+		}
+		return methodName
 	}
+	
 	return ""
 }
 

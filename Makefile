@@ -10,10 +10,11 @@ BINARY_LINUX=$(BINARY_NAME)
 BUILDDIR=build
 VERSION=dev-latest
 
-.PHONY: all build build-windows build-linux clean
+.PHONY: all build build-windows build-linux clean test test-ci check pre-commit
 
 all: build
 
+# Build targets
 build: build-windows build-linux
 
 build-windows:
@@ -22,8 +23,39 @@ build-windows:
 build-linux:
 	set CGO_ENABLED=0&& set GOOS=linux&& set GOARCH=amd64&& go build -o $(BUILDDIR)/$(BINARY_LINUX) -ldflags "-X main.version=$(VERSION) -w -s" ./cmd/annotator
 
+# Test targets
+test:
+	$(GOTEST) -v ./...
+
+test-ci:
+	$(GOTEST) -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+test-coverage:
+	$(GOTEST) -v -coverprofile=coverage.txt -covermode=atomic ./...
+
+# Quick check (verify + vet + test)
+check:
+	$(GOCMD) mod verify
+	$(GOCMD) vet ./...
+	$(GOTEST) -v ./...
+
+# Complete pre-commit check (Windows-compatible - no race detection)
+pre-commit:
+	$(GOCMD) mod verify
+	$(GOBUILD) -v ./cmd/annotator
+	$(GOCMD) vet ./...
+	$(GOTEST) -v -coverprofile=coverage.txt -covermode=atomic ./...
+
+# CI check (Linux - with race detection)
+ci:
+	$(GOCMD) mod verify
+	$(GOBUILD) -v ./cmd/annotator
+	$(GOCMD) vet ./...
+	$(GOTEST) -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+
 clean:
 	if exist annotator.exe del annotator.exe
 	if exist annotator del annotator
 	if exist annotations.json del annotations.json
 	if exist annotations.log del annotations.log
+	if exist coverage.txt del coverage.txt

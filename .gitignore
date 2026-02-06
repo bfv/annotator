@@ -7,3 +7,5 @@ tmp/
 annotations.json
 annotations.log
 
+annotator.exe
+coverage.txt
