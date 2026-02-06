@@ -17,8 +17,19 @@ A class found in `misc/string/Hello.cls` has a class type name of `misc.string.H
 File names (and therefor class names) *are* case-sensitive.
 
 
+## interface statement 
+```
+INTERFACE interface-type-name
+[ INHERITS super-interface-name [ , super-interface-name ] ... ] :
+interface-body
+```
+interfaces are pretty much the same as classes. 
+
+## class and interface files
+Classes and interface have their own file. One file can contain only one interface or one class. 
+
 ## method statement
-Methods in classes are eexpressed like:
+Methods in classes are expressed like:
 ```
 METHOD [ PRIVATE | PACKAGE-PRIVATE | PROTECTED | PACKAGE-PROTECTED | PUBLIC ]
   [ STATIC | ABSTRACT ] [ OVERRIDE ][ FINAL ] 

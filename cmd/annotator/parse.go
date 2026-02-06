@@ -157,6 +157,13 @@ func extractClassName(content, filePath string) string {
 		return matches[1]
 	}
 
+	// Look for INTERFACE statement
+	re = regexp.MustCompile(`(?i)\bINTERFACE\s+([\w.]+)`)
+	matches = re.FindStringSubmatch(content)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+
 	// Fallback: derive from file path
 	className := strings.TrimSuffix(filePath, ".cls")
 	className = strings.ReplaceAll(className, "\\", ".")
@@ -255,6 +262,12 @@ func classifyLines(lines []string) []string {
 			continue
 		}
 
+		// Handle INTERFACE statement
+		if regexp.MustCompile(`(?i)\bINTERFACE\s+`).MatchString(trimmed) {
+			types[i] = "interface"
+			continue
+		}
+
 		// Handle METHOD statement
 		if regexp.MustCompile(`(?i)\bMETHOD\s+`).MatchString(trimmed) {
 			types[i] = "method"
@@ -308,6 +321,12 @@ func parseAnnotation(lines []string, startLine int, filePath, className string, 
 
 		if lt == "class" {
 			constructType = "class"
+			constructLine = i + 1 // 1-based line number
+			break
+		}
+
+		if lt == "interface" {
+			constructType = "interface"
 			constructLine = i + 1 // 1-based line number
 			break
 		}
