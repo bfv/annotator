@@ -1,0 +1,30 @@
+{
+  "name": "Annotator Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "installDockerBuildx": true,
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go"
+      ],
+      "settings": {
+        "go.lintTool": "golangci-lint",
+        "go.useLanguageServer": true,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "mounts": [
+    "source=${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+  ],
+  "postCreateCommand": "bash -c 'NAME=$(powershell.exe -Command \"git config --global user.name\" 2>/dev/null | tr -d \"\\r\\n\"); EMAIL=$(powershell.exe -Command \"git config --global user.email\" 2>/dev/null | tr -d \"\\r\\n\"); if [ ! -z \"$NAME\" ]; then git config --global user.name \"$NAME\"; fi; if [ ! -z \"$EMAIL\" ]; then git config --global user.email \"$EMAIL\"; fi; git config --global user.signingkey ~/.ssh/id_ed25519_sk.pub; git config --global gpg.format ssh; echo done'"
+}
