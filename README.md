@@ -1,8 +1,9 @@
 # Annotator
 Reading OpenEdge 4GL annotations and outputting them to a JSON file.
 
-There are four types of annotations: 
+There are several types of annotations: 
 - class
+- interface
 - method
 - property
 - free
@@ -48,6 +49,7 @@ Notes:
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 1.1.0   | 2026-02-06 | added annotating interfaces | 
 | 1.0.0   | 2026-01-02 | First full release |
 |         |            | SBOM files in release artifacts |
 |         |            | SBOM checked for critical vulnerabilities |
