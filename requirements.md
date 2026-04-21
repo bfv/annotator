@@ -4,7 +4,7 @@
 The goal of the annotator project is to scan OpenEdge 4GL class file (file with a .cls extension) and scan these for so called annotations. All the annotation should be outputted in JSON format, so other tools can use these to do their jobs. The other tools are out of scope.
 
 ## technical stack
-- We use the latest Go version, 1.25.5.
+- We use the latest Go version, 1.26.2.
   - use cobra/viper for parameters
     - go get github.com/spf13/viper v1.21.0
     - go get -u github.com/spf13/cobra@latest
