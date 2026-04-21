@@ -3,6 +3,10 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "runArgs": [
+    // Dit is de cruciale stap voor DinD: privileges voor de daemon
+    "--privileged"
+  ],
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "version": "latest",
@@ -26,5 +30,5 @@
   "mounts": [
     "source=${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
   ],
-  "postCreateCommand": "bash -c 'NAME=$(powershell.exe -Command \"git config --global user.name\" 2>/dev/null | tr -d \"\\r\\n\"); EMAIL=$(powershell.exe -Command \"git config --global user.email\" 2>/dev/null | tr -d \"\\r\\n\"); if [ ! -z \"$NAME\" ]; then git config --global user.name \"$NAME\"; fi; if [ ! -z \"$EMAIL\" ]; then git config --global user.email \"$EMAIL\"; fi; git config --global user.signingkey ~/.ssh/id_ed25519_sk.pub; git config --global gpg.format ssh; echo done'"
+  "postCreateCommand": "bash -c 'NAME=$(powershell.exe -Command \"git config --global user.name\" 2>/dev/null | tr -d \"\\r\\n\"); EMAIL=$(powershell.exe -Command \"git config --global user.email\" 2>/dev/null | tr -d \"\\r\\n\"); if [ ! -z \"$NAME\" ]; then git config --global user.name \"$NAME\"; fi; if [ ! -z \"$EMAIL\" ]; then git config --global user.email \"$EMAIL\"; fi; git config --global user.signingkey ~/.ssh/id_ed25519_sk.pub; git config --global gpg.format ssh; git config --global --add safe.directory ${containerWorkspaceFolder}; echo done'"
 }
